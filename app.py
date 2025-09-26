@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, session, jsonify
-from models import db, User, Tutorial, Step, Progress
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from transformers import pipeline
-import torch
+from models import User, Tutorial, Step, Progress
+import google.generativeai as genai
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -10,11 +10,17 @@ app.secret_key = 'your_secret_key_here'
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tutorials.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+db = SQLAlchemy(app)
 
-# Hugging Face pipeline setup (using bigcode/starcoder as requested)
-device = 0 if torch.cuda.is_available() else -1
-code_tutor = pipeline('text-generation', model='bigcode/starcoder', device=device)
+genai.configure(api_key="AIzaSyA5tWjXreSWnvXzJC3jsk9yXyM1TqB8yek")
+
+def gemini_code_tutor(prompt):
+    try:
+        model = genai.GenerativeModel("gemini-pro-vision")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"AI error: {str(e)}"
 
 with app.app_context():
     db.create_all()
@@ -136,8 +142,8 @@ def generate_tutorial():
         topic = request.form['topic']
         prompt = f"Create a step-by-step tutorial for '{topic}' in 5–6 steps."
         try:
-            result = code_tutor(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)[0]['generated_text']
-            steps = [step for step in result.split('\n') if step.strip()]
+            result = gemini_code_tutor(prompt)
+            steps = [result]
         except Exception as e:
             steps = [f"AI error: {str(e)}"]
     return render_template('generate_tutorial.html', steps=steps)
@@ -153,8 +159,7 @@ def ai_tutor():
         user_code = request.form['user_code']
         prompt = f"Act as a tutor. The user submitted this code/problem:\n\n{user_code}\n\nExplain what it does, find errors if any, and give step-by-step suggestions to improve or fix it."
         try:
-            result = code_tutor(prompt, max_new_tokens=400, do_sample=True, temperature=0.7)[0]['generated_text']
-            ai_response = result.strip()
+            ai_response = gemini_code_tutor(prompt)
         except Exception as e:
             error = f"AI error: {str(e)}"
     return render_template('ai_tutor.html', ai_response=ai_response, user_code=user_code, error=error)
