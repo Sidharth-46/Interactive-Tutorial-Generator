@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tutorials.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-genai.configure(api_key="AIzaSyA5tWjXreSWnvXzJC3jsk9yXyM1TqB8yek")
+genai.configure(api_key="YOUR_GEMINI_API_KEY_HERE")
 
 def gemini_code_tutor(prompt):
     try:
