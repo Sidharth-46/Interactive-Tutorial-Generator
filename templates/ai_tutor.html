@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>AI Code Tutor</h2>
+<form method="post" class="ai-form">
+    <label for="user_code">Paste your code or problem:</label>
+    <textarea name="user_code" id="user_code" rows="10" placeholder="Paste your code or describe your problem here..." required>{{ user_code|default('') }}</textarea>
+    <button type="submit">Get AI Suggestions</button>
+</form>
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
+{% if ai_response %}
+    <div class="ai-response">
+        <pre>{{ ai_response }}</pre>
+    </div>
+{% endif %}
+{% endblock %}

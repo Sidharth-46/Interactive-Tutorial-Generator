@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<a href="{{ url_for('create_tutorial') }}" style="margin-bottom:20px; display:inline-block;">
+    <button>Create New Tutorial</button>
+</a>
+
+<div class="tutorial-list">
+    {% for tutorial in tutorials %}
+        <div class="tutorial-card">
+            <h3>{{ tutorial.title }}</h3>
+            <p>{{ tutorial.description[:100] }}{% if tutorial.description|length > 100 %}...{% endif %}</p>
+            <a href="{{ url_for('tutorial_view', tutorial_id=tutorial.id) }}">
+                <button>View Tutorial</button>
+            </a>
+        </div>
+    {% else %}
+        <p>No tutorials available. Create one!</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

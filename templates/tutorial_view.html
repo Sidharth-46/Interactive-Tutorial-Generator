@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="tutorial-card">
+    <h2>{{ tutorial.title }}</h2>
+    <p>{{ tutorial.description }}</p>
+
+    {% if session.get('user_id') %}
+        {% set total_steps = steps|length %}
+        {% set completed_count = completed_steps|length %}
+        {% set progress_percent = (completed_count / total_steps * 100) if total_steps > 0 else 0 %}
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ progress_percent }}%;"></div>
+        </div>
+        <p class="progress-count">{{ completed_count }} / {{ total_steps }} steps completed</p>
+    {% endif %}
+</div>
+
+<h3>Steps</h3>
+<ol>
+    {% for step in steps %}
+        <li>
+            {{ step.content | e }}
+            {% if session.get('user_id') %}
+                {% if step.id in completed_steps %}
+                    <span style="color:green; font-weight:bold;">✅ Completed</span>
+                    <button class="undo-btn" aria-label="Undo complete for step {{ loop.index }}" onclick="undoStep('{{ tutorial.id }}', '{{ step.id }}', this)">Undo</button>
+                {% else %}
+                    <button class="complete-btn" aria-label="Mark step {{ loop.index }} as complete" onclick="completeStep('{{ tutorial.id }}', '{{ step.id }}', this)">Mark Complete</button>
+                    <span class="error-message" style="display:none; color:red;">Failed to mark as complete. Please try again.</span>
+                {% endif %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ol>
+{% endblock %}

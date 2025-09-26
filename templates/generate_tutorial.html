@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Generate AI Tutorial</h2>
+<form method="post">
+    Topic: <input type="text" name="topic" placeholder="e.g., Python loops" required>
+    <input type="submit" value="Generate Steps">
+</form>
+
+{% if steps %}
+<h3>AI Generated Steps:</h3>
+<ol>
+    {% for step in steps %}
+        <li>{{ step }}</li>
+    {% endfor %}
+</ol>
+{% endif %}
+{% endblock %}

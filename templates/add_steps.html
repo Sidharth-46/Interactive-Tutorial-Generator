@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Add Steps for "{{ tutorial.title }}"</h2>
+<form method="post">
+    Step Content: <textarea name="content" required></textarea><br>
+    <input type="submit" value="Add Step">
+</form>
+
+<h3>Existing Steps</h3>
+<ol>
+    {% for step in steps %}
+        <li>{{ step.content }}</li>
+    {% endfor %}
+</ol>
+{% endblock %}
